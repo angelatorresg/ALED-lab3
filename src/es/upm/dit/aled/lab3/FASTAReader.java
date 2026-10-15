@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -135,8 +136,16 @@ public class FASTAReader {
 	 * pattern when one has been found to be different.
 	 */
 	private boolean compareImproved(byte[] pattern, int position) throws FASTAException {
-		// TODO
-		return false;
+		//TODO
+		if (position + pattern.length > validBytes) {
+			throw new FASTAException("Pattern goes beyond the end of the file.");
+		}
+		for (int i = 0; i < pattern.length; i++) {
+			if (pattern[i] != content[position + i]) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/*
@@ -148,8 +157,17 @@ public class FASTAReader {
 	 * ones present in the indicated position.
 	 */
 	private int compareNumErrors(byte[] pattern, int position) throws FASTAException {
-		// TODO
-		return -1;
+		//TODO
+		if (position + pattern.length > validBytes) {
+			throw new FASTAException("Pattern goes beyond the end of the file.");
+		}
+		int error = 0;
+		for (int i = 0; i < pattern.length; i++) {
+			if (pattern[i] != content[position + i]) {
+				error++;
+			}
+		}
+		return error;
 	}
 
 	/**
@@ -163,7 +181,17 @@ public class FASTAReader {
 	 */
 	public List<Integer> search(byte[] pattern) {
 		// TODO
-		return null;
+		List<Integer> sol = new ArrayList<>();
+		for(int i = 0; i < validBytes; i++) {
+			try {
+				if(this.compareImproved(pattern, i)) {
+					sol.add(i);
+				}
+			} catch(Exception e) {
+				break;
+			}
+		}
+		return sol;
 	}
 
 	/**
@@ -180,7 +208,17 @@ public class FASTAReader {
 	 */
 	public List<Integer> searchSNV(byte[] pattern) {
 		// TODO
-		return null;
+		List<Integer> sol = new ArrayList<>();
+		for(int i = 0; i < validBytes; i++) {
+			try {
+				if(this.compareNumErrors(pattern, i) <= 1) {
+					sol.add(i);
+				}
+			} catch(Exception e) {
+				break;
+			}
+		}
+		return sol;
 	}
 
 	public static void main(String[] args) {
@@ -190,7 +228,7 @@ public class FASTAReader {
 			return;
 		System.out.println("Tiempo de apertura de fichero: " + (System.nanoTime() - t1));
 		long t2 = System.nanoTime();
-		List<Integer> posiciones = reader.search(args[1].getBytes());
+		List<Integer> posiciones = reader.searchSNV(args[1].getBytes());
 		System.out.println("Tiempo de búsqueda: " + (System.nanoTime() - t2));
 		if (posiciones.size() > 0) {
 			for (Integer pos : posiciones)

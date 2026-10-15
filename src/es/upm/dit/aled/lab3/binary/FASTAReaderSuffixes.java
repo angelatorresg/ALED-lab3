@@ -1,5 +1,6 @@
 package es.upm.dit.aled.lab3.binary;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -79,6 +80,23 @@ public class FASTAReaderSuffixes extends FASTAReader {
 	@Override
 	public List<Integer> search(byte[] pattern) {
 		// TODO
+		List<Integer> sol = new ArrayList<>();
+		int lo = 0;
+		int hi = suffixes.length - 1;
+		
+		while(lo <= hi) {
+			int m = (hi+lo)/2;
+			int posSuffix = suffixes[m].suffixIndex;
+			boolean found = true;
+			for(int i = 0; i < pattern.length; i++) {
+				if(pattern[i]!=content[posSuffix + i]) {
+					found = false;
+					break;
+				}
+			}
+			
+		}
+		
 		return null;
 	}
 
@@ -93,13 +111,13 @@ public class FASTAReaderSuffixes extends FASTAReader {
 		System.out.println("Tiempo de ordenación: " + (System.nanoTime() - t2));
 		reader.printSuffixes();
 		long t3 = System.nanoTime();
-		List<Integer> posiciones = reader.search(patron);
+		//List<Integer> posiciones = reader.search(patron);
 		System.out.println("Tiempo de búsqueda: " + (System.nanoTime() - t3));
-		if (posiciones.size() > 0) {
-			for (Integer pos : posiciones)
-				System.out.println("Encontrado " + args[1] + " en " + pos);
-		} else
-			System.out.println("No he encontrado " + args[1] + " en ningún sitio.");
-		System.out.println("Tiempo total: " + (System.nanoTime() - t1));
+		//if (posiciones.size() > 0) {
+			//for (Integer pos : posiciones)
+				//System.out.println("Encontrado " + args[1] + " en " + pos);
+		//} else
+			//System.out.println("No he encontrado " + args[1] + " en ningún sitio.");
+		//System.out.println("Tiempo total: " + (System.nanoTime() - t1));
 	}
 }
