@@ -184,10 +184,10 @@ public class FASTAReader {
 		List<Integer> sol = new ArrayList<>();
 		for(int i = 0; i < validBytes; i++) {
 			try {
-				if(this.compareImproved(pattern, i)) {
+				if(compareImproved(pattern, i)) { //No hace falta poner this. delante porque al ser la misma clase está implícito, igual que no ponemos this.content al usar atributos dentro de la misma clase
 					sol.add(i);
 				}
-			} catch(Exception e) {
+			} catch(FASTAException e) {
 				break;
 			}
 		}
@@ -211,7 +211,7 @@ public class FASTAReader {
 		List<Integer> sol = new ArrayList<>();
 		for(int i = 0; i < validBytes; i++) {
 			try {
-				if(this.compareNumErrors(pattern, i) <= 1) {
+				if(compareNumErrors(pattern, i) <= 1) {
 					sol.add(i);
 				}
 			} catch(Exception e) {

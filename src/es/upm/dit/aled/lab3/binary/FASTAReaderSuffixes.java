@@ -2,6 +2,7 @@ package es.upm.dit.aled.lab3.binary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import es.upm.dit.aled.lab3.FASTAReader;
@@ -85,19 +86,73 @@ public class FASTAReaderSuffixes extends FASTAReader {
 		int hi = suffixes.length - 1;
 		
 		while(lo <= hi) {
-			int m = (hi+lo)/2;
+			int m = (hi + lo) / 2;
 			int posSuffix = suffixes[m].suffixIndex;
 			boolean found = true;
+			int posDiferencia = 0;
 			for(int i = 0; i < pattern.length; i++) {
+				if(posSuffix + i >= validBytes) {          // Sufijo más corto que el patrón
+					found = false;
+					posDiferencia = -1;
+					break;
+				}
 				if(pattern[i]!=content[posSuffix + i]) {
 					found = false;
+					posDiferencia = i;
 					break;
 				}
 			}
-			
+			if(found) {
+				sol.add(posSuffix);
+				
+				//sufijos siguientes
+				int indexAdd = 1;
+				while(m + indexAdd < suffixes.length) {
+					int nextPosSuffix = suffixes[m + indexAdd].suffixIndex;
+					boolean isAlsoMatch = true;
+					for(int i = 0; i < pattern.length; i++) {
+						if(nextPosSuffix + i >= validBytes || pattern[i]!=content[nextPosSuffix + i]) {
+							isAlsoMatch = false;
+							break;
+						}
+					}
+					if(isAlsoMatch) {
+						sol.add(nextPosSuffix);
+						indexAdd++;
+					} else {
+						break;
+					}
+				}
+				
+				//sufijos anteriores
+				int indexSubstract = 1;
+				while(m - indexSubstract >= 0) {
+					int nextPosSuffix = suffixes[m - indexSubstract].suffixIndex;
+					boolean isAlsoMatch = true;
+					for(int i = 0; i < pattern.length; i++) {
+						if(nextPosSuffix + i >= validBytes || pattern[i]!=content[nextPosSuffix + i]) {
+							isAlsoMatch = false;
+							break;
+						}
+					}
+					if(isAlsoMatch) {
+						sol.add(nextPosSuffix);
+						indexSubstract++;
+					} else {
+						break;
+					}
+				}
+			break;
+				
+			} else if(posDiferencia == -1 || pattern[posDiferencia] > content[posSuffix + posDiferencia]) {
+				lo = m + 1;
+			} else {
+				hi = m - 1;
+			}
 		}
 		
-		return null;
+		Collections.sort(sol);
+		return sol;
 	}
 
 	public static void main(String[] args) {
@@ -111,13 +166,13 @@ public class FASTAReaderSuffixes extends FASTAReader {
 		System.out.println("Tiempo de ordenación: " + (System.nanoTime() - t2));
 		reader.printSuffixes();
 		long t3 = System.nanoTime();
-		//List<Integer> posiciones = reader.search(patron);
+		List<Integer> posiciones = reader.search(patron);
 		System.out.println("Tiempo de búsqueda: " + (System.nanoTime() - t3));
-		//if (posiciones.size() > 0) {
-			//for (Integer pos : posiciones)
-				//System.out.println("Encontrado " + args[1] + " en " + pos);
-		//} else
-			//System.out.println("No he encontrado " + args[1] + " en ningún sitio.");
-		//System.out.println("Tiempo total: " + (System.nanoTime() - t1));
+		if (posiciones.size() > 0) {
+			for (Integer pos : posiciones)
+				System.out.println("Encontrado " + args[1] + " en " + pos);
+		} else
+			System.out.println("No he encontrado " + args[1] + " en ningún sitio.");
+		System.out.println("Tiempo total: " + (System.nanoTime() - t1));
 	}
 }
